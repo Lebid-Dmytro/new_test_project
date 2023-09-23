@@ -1,0 +1,8 @@
+Django==4.2.5
+djangorestframework==3.14.0
+psycopg2==2.8.6
+django-filter==22.1
+djoser==2.2.0
+djangorestframework-simplejwt==5.3.0
+drf-yasg==1.21.7
+voting==0.1.3
