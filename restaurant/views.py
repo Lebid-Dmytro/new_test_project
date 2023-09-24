@@ -13,13 +13,32 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     '''List of all employees'''
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class RestaurantCreateView(generics.CreateAPIView):
+    '''Greate restaurant'''
+    queryset = Restaurant.objects.all()
+    serializer_class = RestaurantSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class MenuCreateView(generics.CreateAPIView):
+    '''Greate menu for today'''
+    serializer_class = MenuSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        restaurant_id = self.kwargs['restaurant_id']
+        restaurant = Restaurant.objects.get(pk=restaurant_id)
+        serializer.save(restaurant=restaurant)
 
 
 class RestaurantListView(generics.ListAPIView):
     '''Restaurant list'''
     queryset = Restaurant.objects.all()
     serializer_class = RestaurantSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class MenuListView(generics.ListAPIView):
@@ -27,6 +46,21 @@ class MenuListView(generics.ListAPIView):
     today = timezone.now().date()
     queryset = Menu.objects.filter(date=today)
     serializer_class = MenuSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class VoteCreateView(generics.CreateAPIView):
+    '''Grete new vote'''
+    queryset = Vote.objects.all()
+    serializer_class = VoteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # Отримайте користувача (employee), який голосує, з контексту авторизації
+        employee = self.request.user.employee
+
+        # Збережіть користувача (employee) у дані для створення голосу
+        serializer.save(employee=employee)
 
 
 class VoteView(generics.ListAPIView):
@@ -34,10 +68,11 @@ class VoteView(generics.ListAPIView):
     today = timezone.now().date()
     queryset = Vote.objects.filter(date=today)
     serializer_class = VoteSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class MaxVoteAPIView(APIView):
-    '''Selected menu'''
+    '''Selected favorite menu'''
     def get(self, request):
         try:
             today = timezone.now().date()

@@ -6,7 +6,7 @@ from rest_framework.authtoken.admin import User
 
 
 class Restaurant(models.Model):
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, unique=True)
     description = models.TextField()
     rating = models.SmallIntegerField(default=5)
 
@@ -25,7 +25,7 @@ class Menu(models.Model):
 
 
 class Employee(models.Model):
-    employee = models.OneToOneField(User, on_delete=models.CASCADE)
+    employee = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
 
     def __str__(self):
         return f'{self.employee}'
