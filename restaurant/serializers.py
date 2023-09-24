@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import Employee, Restaurant, Menu, Vote
 
 
@@ -21,7 +22,6 @@ class MenuSerializer(serializers.ModelSerializer):
 
 
 class VoteSerializer(serializers.ModelSerializer):
-    # Додайте read-only поле із назвою 'your_read_only_field'
     your_read_only_field = serializers.ReadOnlyField()
 
     class Meta:
@@ -29,17 +29,13 @@ class VoteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        # Отримайте користувача (employee), який голосує, з контексту авторизації
         employee = self.context['request'].user.employee
 
-        # Збережіть голос користувача
         validated_data['employee'] = employee
         your_read_only_field_value = validated_data.get('your_read_only_field', None)
         validated_data.pop('your_read_only_field', None)
 
         vote = Vote.objects.create(**validated_data)
-
-        # Обробіть ваше read-only поле і що завгодно інше, якщо потрібно
 
         return vote
 

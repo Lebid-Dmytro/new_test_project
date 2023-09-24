@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.db import models
-from django.template.defaultfilters import slugify
 from rest_framework.authtoken.admin import User
 
 
@@ -38,5 +37,3 @@ class Vote(models.Model):
 
     def __str__(self):
         return f'{self.employee} - {self.restaurant}'
-
-

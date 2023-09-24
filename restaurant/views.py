@@ -1,12 +1,12 @@
-from django.db.models import Count, Max
+from django.db.models import Count
 from django.utils import timezone
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from restaurant.models import Restaurant, Menu, Employee, Vote
-from restaurant.serializers import RestaurantSerializer, MenuSerializer, VoteSerializer, MaxVoteResultSerializer, \
-    EmployeeSerializer
+from restaurant.serializers import RestaurantSerializer, MenuSerializer, VoteSerializer, \
+    MaxVoteResultSerializer, EmployeeSerializer
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):
@@ -56,10 +56,7 @@ class VoteCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        # Отримайте користувача (employee), який голосує, з контексту авторизації
         employee = self.request.user.employee
-
-        # Збережіть користувача (employee) у дані для створення голосу
         serializer.save(employee=employee)
 
 
@@ -73,17 +70,18 @@ class VoteView(generics.ListAPIView):
 
 class MaxVoteAPIView(APIView):
     '''Selected favorite menu'''
+
     def get(self, request):
         try:
             today = timezone.now().date()
 
             max_votes_for_restaurant = (
                 Vote.objects
-                .filter(date=today)
-                .values('restaurant__name')
-                .annotate(max_votes=Count('id'))
-                .order_by('-max_votes')
-                .first()
+                    .filter(date=today)
+                    .values('restaurant__name')
+                    .annotate(max_votes=Count('id'))
+                    .order_by('-max_votes')
+                    .first()
             )
 
             max_votes_for_restaurant_value = max_votes_for_restaurant['max_votes']
